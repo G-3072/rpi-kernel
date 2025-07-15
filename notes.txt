@@ -1,2 +1,20 @@
+tutorial:
+https://jsandler18.github.io/tutorial/boot.html
+
+useful:
+
+arm1176JZF-S instruction set summary:   https://developer.arm.com/documentation/ddi0301/h/introduction/arm1176jzf-s-instruction-set-summary/extended-arm-instruction-set-summary
+                                        https://developer.arm.com/documentation/ddi0597/2025-06/Base-Instructions?lang=en
+
+rpi bare metal examples: https://github.com/dwelch67/raspberrypi-zero?tab=readme-ov-file
+
 Project info:
     basic ahh kernel and OS for raspi Zero (BCM2835 --> ARM1176JZF-S)
+
+qemu:
+    qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel FILE.elf
+
+    -m --> set ram size (512MB)
+    -M --> set machine as raspberry pi Zero
+    -serial --> redirect serial port to stdio / standard shell
+    -kernel --> specify kernel 
