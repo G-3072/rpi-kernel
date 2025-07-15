@@ -1,0 +1,2 @@
+Project info:
+    basic ahh kernel and OS for raspi Zero (BCM2835 --> ARM1176JZF-S)
