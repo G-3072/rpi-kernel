@@ -21,8 +21,8 @@ addressCheck:
     cmp r4, r5          // compare addresses in r4 and r5 (r4 - r5) and set status flags
     bcc zeroBSSLoop     // if carry flag is cleared (means underflow --> r4 < r5) loop 
 
-    ldr r3, =kernel_main    // load kernel main function into r3
-    blx r3
+    ldr r3, =kernel_main    // load kernel_main function address into r3
+    blx r3                  // jump to address in r3
 
 end:
     wfe

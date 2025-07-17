@@ -6,6 +6,7 @@ LDFLAGS = -Wl,--gc-sections -nostdlib -ffreestanding -O2
 IMG_NAME = kernel.img
 
 BUILD_DIR = build
+BIN_DIR = bin
 
 KER_SRC = src/kernel
 COMMON_SRC =src/common
@@ -26,12 +27,12 @@ OBJECTS = 	${patsubst ${KER_SRC}/%.c, ${BUILD_DIR}/%.o, ${KER_C_SOURCES}} \
 			${patsubst ${COMMON_SRC}/%.S, ${BUILD_DIR}/%.o, ${COMMON_ASM_SOURCES}} \
 
 all: ${OBJECTS} ${HEADERS}
-	${ARMGNU}-gcc  -T linker.ld -o ${BUILD_DIR}/kernel.elf ${OBJECTS} ${LDFLAGS}
-	${ARMGNU}-objcopy ${BUILD_DIR}/kernel.elf -O binary ${BUILD_DIR}/${IMG_NAME}
+	${ARMGNU}-gcc  -T linker.ld -o ${BIN_DIR}/kernel.elf ${OBJECTS} ${LDFLAGS}
+	${ARMGNU}-objcopy ${BIN_DIR}/kernel.elf -O binary ${BIN_DIR}/${IMG_NAME}
 
 ${BUILD_DIR}/%.o: ${KER_SRC}/%.c
 	mkdir -p $(@D)
-	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS} 
+	${ARMGNU}-gcc -c $< -o $@ -I${KER_HEAD} ${CFLAGS} 
 ${BUILD_DIR}/%.o: ${COMMON_SRC}/%.c
 	mkdir -p $(@D)
 	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
@@ -40,7 +41,7 @@ ${BUILD_DIR}/%.o: ${KER_SRC}/%.S
 	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
 ${BUILD_DIR}/%.o: ${COMMON_SRC}/%.S
 	mkdir -p $(@D)
-	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
+	${ARMGNU}-gcc -c $< -o $@ -I${KER_HEAD} ${CFLAGS}
 
 clean:
 	rm -rf ${BUILD_DIR}
