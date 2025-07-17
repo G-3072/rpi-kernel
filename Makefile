@@ -1,25 +1,49 @@
-CC = arm-none-eabi-gcc
+ARMGNU = arm-none-eabi
 
-CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding
-LFLAGS = -ffreestanding -O1 -nostdlib
+CFLAGS = -mcpu=arm1176jzf-s -fpic -nostdlib -ffreestanding -ffunction-sections -fdata-sections -Wall
+LDFLAGS = -Wl,--gc-sections -nostdlib -ffreestanding -O2
+
+IMG_NAME = kernel.img
+
+BUILD_DIR = build
 
 KER_SRC = src/kernel
-COMMON_SRC = src/common
-KER_INC = include/kernel
-COMMON_INC = include/common
-OBJ_DIR = build
-BIN_DIR = bin
+COMMON_SRC =src/common
 
-OBJECTS = ${wildcard ${OBJ_DIR}/*.o}
+KER_HEAD = include/kernel
+COMMON_HEAD = include/common
 
-all: startup.o kernel.o
-	${CC} -T cortex-A72.ld -o ${BIN_DIR}/kernel.elf ${LFLAGS} ${OBJECTS}
-	arm-none-eabi-objcopy ${BIN_DIR}/kernel.elf -O ${BIN_DIR}/kernel.img
+HEADERS = ${wildcard ${KER_HEAD}/*.h} ${wildcard ${COMMON_HEAD}/*.h}
 
-startup.o: ${KER_SRC}/startup.S
-	${CC} -c ${KER_SRC}/startup.S -o ${OBJ_DIR}/startup.o ${CFLAGS}
+KER_C_SOURCES		= ${wildcard ${KER_SRC}/*.c}
+COMMON_C_SOURCES	= ${wildcard ${COMMON_SRC}/*.c}
+KER_ASM_SOURCES 	= ${wildcard ${KER_SRC}/*.S}
+COMMON_ASM_SOURCES 	= ${wildcard ${COMMON_SRC}/*.S}
 
-kernel.o: ${KER_SRC}/kernel.c
-	${CC} -c ${KER_SRC}/kernel.c -o ${OBJ_DIR}/kernel.o ${CFLAGS}
+OBJECTS = 	${patsubst ${KER_SRC}/%.c, ${BUILD_DIR}/%.o, ${KER_C_SOURCES}} \
+			${patsubst ${COMMON_SRC}/%.c, ${BUILD_DIR}/%.o, ${COMMON_C_SOURCES}} \
+			${patsubst ${KER_SRC}/%.S, ${BUILD_DIR}/%.o, ${KER_ASM_SOURCES}} \
+			${patsubst ${COMMON_SRC}/%.S, ${BUILD_DIR}/%.o, ${COMMON_ASM_SOURCES}} \
 
-# clean:
+all: ${OBJECTS} ${HEADERS}
+	${ARMGNU}-gcc  -T linker.ld -o ${BUILD_DIR}/kernel.elf ${OBJECTS} ${LDFLAGS}
+	${ARMGNU}-objcopy ${BUILD_DIR}/kernel.elf -O binary ${BUILD_DIR}/${IMG_NAME}
+
+${BUILD_DIR}/%.o: ${KER_SRC}/%.c
+	mkdir -p $(@D)
+	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS} 
+${BUILD_DIR}/%.o: ${COMMON_SRC}/%.c
+	mkdir -p $(@D)
+	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
+${BUILD_DIR}/%.o: ${KER_SRC}/%.S
+	mkdir -p $(@D)
+	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
+${BUILD_DIR}/%.o: ${COMMON_SRC}/%.S
+	mkdir -p $(@D)
+	${ARMGNU}-gcc -c $< -o $@ ${CFLAGS}
+
+clean:
+	rm -rf ${BUILD_DIR}
+
+run: all
+	qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel build/kernel.img

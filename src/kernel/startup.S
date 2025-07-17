@@ -15,13 +15,13 @@ _start:
     b addressCheck
 
 zeroBSSLoop:
-    str r6, [r4], #4    ; write (word)0x0 from r6 to address in r4 and increment r4 by 4.
+    str r6, [r4], #4    // write (word)0x0 from r6 to address in r4 and increment r4 by 4.
 
 addressCheck:
-    cmp r4, r5          ; compare addresses in r4 and r5 (r4 - r5) and set status flags
-    bcc zeroBSSLoop     ; if carry flag is cleared (means underflow --> r4 < r5) loop 
+    cmp r4, r5          // compare addresses in r4 and r5 (r4 - r5) and set status flags
+    bcc zeroBSSLoop     // if carry flag is cleared (means underflow --> r4 < r5) loop 
 
-    ldr r3, =kernel_main    ; load kernel main function into r3
+    ldr r3, =kernel_main    // load kernel main function into r3
     blx r3
 
 end:
