@@ -5,6 +5,8 @@
 
 #include <peripherals.h>
 
+void uart_setBaudrate(uint32_t baudrate);
+
 void uart_init(void);
 void uart_putc(unsigned char c);
 unsigned char uart_getc(void);

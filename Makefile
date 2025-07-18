@@ -1,7 +1,7 @@
 ARMGNU = arm-none-eabi
 
-CFLAGS = -mcpu=arm1176jzf-s -fpic -nostdlib -ffreestanding -ffunction-sections -fdata-sections -Wall
-LDFLAGS = -Wl,--gc-sections -nostdlib -ffreestanding -O2
+CFLAGS = -mcpu=arm1176jzf-s -fpic -nostdlib -ffreestanding #-ffunction-sections -fdata-sections -Wall
+LDFLAGS = -nostdlib -ffreestanding -O0 #-Wl,--gc-sections
 
 IMG_NAME = kernel.img
 
@@ -27,7 +27,8 @@ OBJECTS = 	${patsubst ${KER_SRC}/%.c, ${BUILD_DIR}/%.o, ${KER_C_SOURCES}} \
 			${patsubst ${COMMON_SRC}/%.S, ${BUILD_DIR}/%.o, ${COMMON_ASM_SOURCES}} \
 
 all: ${OBJECTS} ${HEADERS}
-	${ARMGNU}-gcc  -T linker.ld -o ${BIN_DIR}/kernel.elf ${OBJECTS} ${LDFLAGS}
+	mkdir -p ${BIN_DIR}
+	${ARMGNU}-gcc  -T linker.ld -o ${BIN_DIR}/kernel.elf ${OBJECTS} ${LDFLAGS} -lgcc
 	${ARMGNU}-objcopy ${BIN_DIR}/kernel.elf -O binary ${BIN_DIR}/${IMG_NAME}
 
 ${BUILD_DIR}/%.o: ${KER_SRC}/%.c
@@ -45,6 +46,7 @@ ${BUILD_DIR}/%.o: ${COMMON_SRC}/%.S
 
 clean:
 	rm -rf ${BUILD_DIR}
+	rm -rf ${BIN_DIR}
 
 run: all
-	qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel build/kernel.img
+	qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel bin/kernel.img
