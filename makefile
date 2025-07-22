@@ -55,7 +55,7 @@ all: ${OBJECT_FILES} ${HEADERS}
 	${OBJCOPY} ${BUILD_DIR}/kernel.elf -O binary ${BUILD_DIR}/kernel.img
 
 clean:
-	rm -rf build
+	rm -rf build/**
 
 run: all
 	qemu-system-arm -M raspi0 -m 512 ${SERIAL_ARG} -kernel ${BUILD_DIR}/kernel.elf -display none

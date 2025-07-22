@@ -9,13 +9,12 @@ _start:
     ldr r4, =__bss_start
     ldr r5, =__bss_end
     mov r6, #0
-    mov r7, #0
-    mov r8, #0
-    mov r9, #0
+
     b zeroBSS2
 
 zeroBSS1:
-    stmia r4!, {r5-r8}
+    @ stmia r4!, {r5-r8}
+    str r6, [r4], #4
 
 zeroBSS2:
     cmp r4, r5

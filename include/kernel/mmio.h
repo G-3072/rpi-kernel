@@ -1,7 +1,6 @@
 #ifndef MMIO_H
 #define MMIO_H
 
-#include <stddef.h>
 #include <stdint.h>
 
 extern void delay(uint32_t count);
